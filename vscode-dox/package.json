@@ -1,0 +1,29 @@
+{
+  "name": "vscode-dox",
+  "displayName": "DOX — Document Open eXchange Format",
+  "description": "Syntax highlighting, validation, and preview for .dox files",
+  "version": "0.1.0",
+  "publisher": "deepsearch-ai",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Programming Languages", "Formatters"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "dox",
+        "aliases": ["DOX", "Document Open eXchange"],
+        "extensions": [".dox"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "dox",
+        "scopeName": "text.dox",
+        "path": "./syntaxes/dox.tmLanguage.json"
+      }
+    ]
+  }
+}

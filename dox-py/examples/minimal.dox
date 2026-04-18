@@ -1,0 +1,30 @@
+---dox
+version: "1.0"
+source: memo.pdf
+lang: en
+---
+
+# Team Standup Notes — April 10, 2026
+
+## Engineering
+
+- Deployed v2.3.1 hotfix for PDF parsing edge case
+- Performance optimization: 2x speedup on table extraction
+- Started spike on handwriting recognition improvements
+
+## Design
+
+- Finalized new dashboard mockups for .dox editor
+- Accessibility audit completed: 3 minor issues flagged
+
+## Action Items
+
+||| table id="actions" caption="Action Items"
+| Owner | Task                              | Due        |
+|-------|-----------------------------------|------------|
+| Alice | Ship table extraction benchmark   | 2026-04-15 |
+| Bob   | Review .dox spec v0.1 draft       | 2026-04-12 |
+| Carol | Update VS Code extension with lint | 2026-04-18 |
+|||
+
+::form field="standup_complete" type="checkbox" value="true"::

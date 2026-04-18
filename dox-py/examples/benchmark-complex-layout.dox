@@ -1,0 +1,244 @@
+---dox
+version: "1.0"
+source: arxiv-2401.12345-multimodal-llm-survey.pdf
+pages: 47
+lang: en
+---
+
+# A Comprehensive Survey of Multimodal Large Language Models: Architectures, Training, and Evaluation
+
+## Abstract
+
+The rapid advancement of Large Language Models (LLMs) has catalyzed a paradigm shift in artificial intelligence, extending beyond text to encompass **vision**, **audio**, and **structured data** modalities. This survey provides a comprehensive analysis of 127 multimodal LLMs published between January 2024 and March 2026, categorizing them across four architectural families: (1) early fusion, (2) late fusion, (3) cross-attention, and (4) mixture-of-experts (MoE). We establish a unified evaluation framework spanning 23 benchmarks and identify critical gaps in current approaches including *hallucination mitigation*, *spatial reasoning*, and *long-context multimodal understanding*.
+
+**Keywords:** multimodal, large language models, vision-language, survey, benchmark
+
+## 1. Introduction
+
+The integration of multiple modalities into language models represents one of the most significant developments in AI research since the introduction of the Transformer architecture [[ref:section:2.1]]. Early work by Radford et al. [^1] on CLIP demonstrated that contrastive pre-training could align visual and textual representations, achieving zero-shot transfer competitive with supervised baselines on ImageNet. Subsequent efforts — including Flamingo [^2], BLIP-2 [^3], and LLaVA [^4] — progressively closed the gap between modality-specific specialists and generalist multimodal systems.
+
+This survey differs from prior reviews in three key respects:
+
+1. **Scope**: We cover 127 models (vs. 43 in the most recent prior survey), including 38 published in 2026
+2. **Depth**: Each model is evaluated across our unified 23-benchmark framework, enabling direct comparison
+3. **Practicality**: We provide concrete recommendations for practitioners choosing between architectures for specific deployment scenarios
+
+The remainder of this paper is organized as follows: Section 2 covers background ([[ref:section:2]]), Section 3 presents our taxonomy ([[ref:section:3]]), and Section 4 reports experimental results ([[ref:section:4]]).
+
+## 2. Background and Related Work
+
+### 2.1 Transformer Architecture
+
+The Transformer [^5] introduced the self-attention mechanism, computed as:
+
+$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$ {math: latex}
+
+where $$Q \in \mathbb{R}^{n \times d_k}$$ {math: latex}, $$K \in \mathbb{R}^{m \times d_k}$$ {math: latex}, and $$V \in \mathbb{R}^{m \times d_v}$$ {math: latex}.
+
+### 2.2 Vision Encoders
+
+Modern vision encoders fall into three categories:
+
+||| table id="t-encoders" caption="Table 1: Vision Encoder Comparison"
+| Encoder Family  | Representative Models          | Resolution | Params   | ImageNet Top-1 |
+|-----------------|--------------------------------|------------|----------|----------------|
+| ViT-based       | ViT-L/14, SigLIP-SO400M       | 224–384    | 304M–1B  | 88.6%          |
+| ConvNeXt        | ConvNeXt-XXL, InternImage-H   | 384–512    | 600M–1B  | 89.1%          |
+| Hybrid          | CoAtNet-7, MaxViT-XL          | 384–512    | 700M–2B  | 89.4%          |
+| Native Res.     | NaViT, FlexiViT, AnyRes-ViT   | Any        | 300M–1B  | 88.2%          |
+|||
+
+### 2.3 Prior Surveys
+
+||| table id="t-surveys" caption="Table 2: Comparison with Existing Surveys"
+| Survey                   | Year | Models Covered | Benchmarks | Open Taxonomy |
+|--------------------------|------|----------------|------------|---------------|
+| Yin et al.               | 2024 | 43             | 12         | No            |
+| Zhang & Wang             | 2025 | 78             | 18         | Partial       |
+| Li et al.                | 2025 | 95             | 15         | Yes           |
+| **This survey (ours)**   | 2026 | 127            | 23         | Yes           |
+|||
+
+## 3. Architectural Taxonomy
+
+### 3.1 Early Fusion
+
+Early fusion architectures concatenate visual tokens with text tokens at the input layer. The visual tokens are produced by a frozen or fine-tuned vision encoder $$f_v$$, projected into the LLM's embedding space via a learned projection matrix $$W_p$$:
+
+$$z_v = W_p \cdot f_v(I) \in \mathbb{R}^{N_v \times d}$$ {math: latex}
+
+The combined input sequence becomes:
+
+$$X = [z_v; z_t] \in \mathbb{R}^{(N_v + N_t) \times d}$$ {math: latex}
+
+**Advantages:**
+- Simple architecture; minimal additional parameters
+- Full bidirectional attention between modalities
+- Easy to scale with larger LLM backbones
+
+**Disadvantages:**
+- Quadratic attention cost with image token count
+- Fixed visual token budget (typically 256–576 tokens)
+- No modality-specific processing
+
+### 3.2 Cross-Attention Fusion
+
+||| table id="t-crossattn" caption="Table 3: Cross-Attention Architectures"
+| Model          | LLM Backbone   | Vision Encoder | Cross-Attn Layers | Total Params | MMLU  | MMBench |
+|----------------|----------------|----------------|--------------------|--------------|-------|---------|
+| Flamingo-80B   | Chinchilla-70B | NFNet-F6       | Every 4th          | 80B          | 71.2  | 68.4    |
+| IDEFICS2-8B    | Mistral-7B     | SigLIP-SO400M  | Every 2nd          | 8.4B         | 63.8  | 72.1    |
+| Qwen-VL-Max    | Qwen2-72B     | ViT-bigG       | Adaptive           | 72B+         | 82.4  | 83.2    |
+| InternVL2-76B  | InternLM2-Chat | InternViT-6B   | Every layer        | 76B          | 80.1  | 81.5    |
+| Cambrian-34B   | Yi-34B        | Ensemble (4)    | Selective          | 34B          | 75.6  | 79.8    |
+|||
+
+### 3.3 Mixture-of-Experts (MoE) Architectures
+
+The MoE approach routes different modalities (or sub-problems) to specialized expert networks:
+
+$$y = \sum_{i=1}^{N} g_i(x) \cdot E_i(x)$$ {math: latex}
+
+where $$g_i(x)$$ {math: latex} is the gating function and $$E_i(x)$$ {math: latex} is the $$i$$-th expert.
+
+||| table id="t-moe" caption="Table 4: MoE Multimodal Models"
+| Model              | Total Params | Active Params | Experts | Modality Routing | MMLU  |
+|--------------------|--------------|---------------|---------|------------------|-------|
+| Mixtral-Vision     | 46.7B        | 12.9B         | 8       | Shared           | 74.2  |
+| DeepSeek-VL2       | 236B         | 28B           | 64      | Modality-aware   | 83.1  |
+| Grok-Vision        | 314B         | 86B           | 8       | Shared           | 85.2  |
+| MoE-LLaVA-3x7B    | 21B          | 7B            | 3       | Learned          | 68.5  |
+|||
+
+## 4. Experimental Results
+
+### 4.1 Unified Benchmark Results
+
+||| table id="t-results" caption="Table 5: Unified Benchmark Results (Top-10 Models)"
+| Rank | Model              | Params | MMLU  | MMBench | MME-P | MME-C | SEED  | MM-Vet | LLaVA-W | RealWorldQA | Avg   |
+|------|--------------------|--------|-------|---------|-------|-------|-------|--------|---------|-------------|-------|
+| 1    | GPT-4o             | ?      | 88.7  | 87.3    | 1868  | 589   | 77.1  | 78.2   | 98.1    | 75.4        | 84.6  |
+| 2    | Gemini 2.5 Pro     | ?      | 87.2  | 85.9    | 1842  | 601   | 76.8  | 75.1   | 96.4    | 74.2        | 83.8  |
+| 3    | Claude 3.5 Sonnet  | ?      | 86.8  | 84.2    | 1810  | 575   | 75.2  | 74.8   | 95.2    | 73.1        | 82.9  |
+| 4    | Qwen-VL-Max        | 72B+   | 82.4  | 83.2    | 1790  | 562   | 74.5  | 72.3   | 93.8    | 71.5        | 81.2  |
+| 5    | InternVL2-76B      | 76B    | 80.1  | 81.5    | 1768  | 548   | 73.8  | 70.9   | 92.1    | 70.2        | 79.8  |
+| 6    | DeepSeek-VL2       | 236B   | 83.1  | 80.8    | 1752  | 555   | 72.9  | 69.4   | 91.5    | 69.8        | 79.5  |
+| 7    | LLaVA-OneVision-72B| 72B    | 79.5  | 79.8    | 1735  | 541   | 72.1  | 68.7   | 90.8    | 68.5        | 78.6  |
+| 8    | Cambrian-34B       | 34B    | 75.6  | 79.8    | 1720  | 532   | 71.5  | 67.2   | 89.4    | 67.1        | 77.4  |
+| 9    | Phi-4-Vision-14B   | 14B    | 76.2  | 77.5    | 1698  | 528   | 70.8  | 65.8   | 88.1    | 66.4        | 76.7  |
+| 10   | Llama-Vision-11B   | 11B    | 73.8  | 74.2    | 1665  | 512   | 69.2  | 63.5   | 86.5    | 64.8        | 74.8  |
+|||
+
+### 4.2 Scaling Laws
+
+We observe a consistent log-linear relationship between model parameters and average benchmark performance:
+
+$$\text{Avg Score} \approx 12.3 \cdot \log_2(\text{Active Params in B}) + 45.7$$ {math: latex}
+
+with $$R^2 = 0.89$$ {math: latex} across all 127 models.
+
+### 4.3 Cost-Performance Analysis
+
+||| table id="t-cost" caption="Table 6: Cost-Performance Tradeoff"
+| Model             | API Cost ($/1M tokens) | Avg Score | Score per Dollar |
+|-------------------|------------------------|-----------|------------------|
+| GPT-4o            | 5.00                   | 84.6      | 16.9             |
+| Gemini 2.5 Pro    | 3.50                   | 83.8      | 23.9             |
+| Claude 3.5 Sonnet | 3.00                   | 82.9      | 27.6             |
+| Qwen-VL-Max       | 1.20                   | 81.2      | 67.7             |
+| Phi-4-Vision-14B  | 0.15 (self-hosted)     | 76.7      | 511.3            |
+| Llama-Vision-11B  | 0.10 (self-hosted)     | 74.8      | 748.0            |
+|||
+
+## 5. Discussion
+
+### 5.1 Key Findings
+
+Our analysis reveals several critical insights:
+
+1. **Architecture matters less than scale** — at comparable parameter counts, early fusion and cross-attention models achieve similar performance (within 2% average score)
+2. **MoE models offer the best efficiency** — DeepSeek-VL2 achieves 79.5 avg score with only 28B active parameters (vs. 72B+ for comparable dense models)
+3. **Resolution is the bottleneck** — models supporting dynamic resolution (AnyRes, NaViT) consistently outperform fixed-resolution counterparts by 3-5% on document understanding tasks
+4. **Hallucination remains unsolved** — even the best models hallucinate on 8-15% of detailed visual questions
+
+### 5.2 Open Problems
+
+- **Spatial reasoning**: Performance drops 15-25% on tasks requiring precise spatial relationship understanding
+- **Long-context multimodal**: No model maintains quality beyond 32K combined tokens (visual + text)
+- **Temporal understanding**: Video-language models lag image-language models by 10-20% on equivalent tasks
+- **Verifiability**: No model provides confidence calibrated to actual accuracy
+
+## 6. Conclusion
+
+This survey has provided the most comprehensive analysis of multimodal LLMs to date, covering 127 models across four architectural families. Our unified 23-benchmark evaluation framework enables direct comparison and reveals that scale, data quality, and resolution flexibility are the dominant factors in model performance. We release our evaluation data and benchmark toolkit at `https://github.com/mllm-survey/benchmark-2026`.
+
+## References
+
+[^1]: Radford, A. et al. "Learning Transferable Visual Models From Natural Language Supervision." ICML 2021.
+
+[^2]: Alayrac, J.-B. et al. "Flamingo: a Visual Language Model for Few-Shot Learning." NeurIPS 2022.
+
+[^3]: Li, J. et al. "BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models." ICML 2023.
+
+[^4]: Liu, H. et al. "Visual Instruction Tuning." NeurIPS 2023.
+
+[^5]: Vaswani, A. et al. "Attention Is All You Need." NeurIPS 2017.
+
+![Architecture comparison diagram](figures/architecture-comparison.png) {figure: id="f-arch"}
+
+![Scaling law visualization](figures/scaling-law.png) {figure: id="f-scaling"}
+
+---spatial page=1 grid=1000x1000
+# A Comprehensive Survey... @[50,40,950,85]
+## Abstract @[50,100,200,120]
+The rapid advancement... @[50,125,950,280]
+---/spatial
+
+---spatial page=5 grid=1000x1000
+## 3. Architectural Taxonomy @[50,40,500,70]
+### 3.1 Early Fusion @[50,85,350,110]
+Early fusion architectures... @[50,120,950,200]
+||| table id="t-crossattn" @[50,420,950,680]
+---/spatial
+
+---spatial page=12 grid=1000x1000
+||| table id="t-results" @[30,50,970,520]
+  | 1 | GPT-4o | ... @[30,95,970,120] cells=[@[30,95,80,120], @[80,95,250,120], @[250,95,340,120], @[340,95,420,120], @[420,95,500,120], @[500,95,570,120], @[570,95,640,120], @[640,95,710,120], @[710,95,800,120], @[800,95,890,120], @[890,95,970,120]]
+---/spatial
+
+---meta
+extracted_by: docling-2.72.0 + granite-docling-258m
+extracted_at: "2026-04-10T16:00:00Z"
+confidence:
+  overall: 0.94
+  t-encoders: 0.98
+  t-surveys: 0.99
+  t-crossattn: 0.96
+  t-moe: 0.97
+  t-results: 0.91
+  t-cost: 0.95
+  f-arch: 0.88
+  f-scaling: 0.85
+  page_1_abstract: 0.97
+  page_5_math_attn: 0.82
+  page_12_table_row_7: 0.78
+provenance:
+  source_hash: "sha256:e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3..."
+  extraction_pipeline:
+    - "ocr:easyocr-v1.7.2"
+    - "layout:doclaynet-v2.1"
+    - "table:tableformer-v1.3"
+    - "math:nougat-v0.2"
+    - "vlm:granite-docling-258m"
+    - "reading-order:docling-v2.72"
+version_history:
+  - ts: "2026-04-10T16:00:00Z"
+    agent: "docling-2.72.0"
+    action: "initial_extraction"
+  - ts: "2026-04-10T16:05:00Z"
+    agent: "dox-lint-0.1.0"
+    action: "flagged 3 elements for review (f-arch: 0.88, page_5_math_attn: 0.82, page_12_table_row_7: 0.78)"
+  - ts: "2026-04-10T16:30:00Z"
+    agent: "human:aresearcher"
+    action: "corrected t-results row 7 (Cambrian params), verified math equations"
+---/meta

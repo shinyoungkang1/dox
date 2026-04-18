@@ -1,0 +1,153 @@
+{
+  "scopeName": "text.dox",
+  "name": "DOX",
+  "patterns": [
+    { "include": "#frontmatter" },
+    { "include": "#spatial-block" },
+    { "include": "#meta-block" },
+    { "include": "#table-block" },
+    { "include": "#code-block" },
+    { "include": "#inline-block" },
+    { "include": "#math-block" },
+    { "include": "#cross-ref" },
+    { "include": "#figure" },
+    { "include": "#footnote" },
+    { "include": "#heading" },
+    { "include": "#bbox" },
+    { "include": "#bold" },
+    { "include": "#italic" },
+    { "include": "#inline-code" },
+    { "include": "#link" }
+  ],
+  "repository": {
+    "frontmatter": {
+      "begin": "^---dox\\s*$",
+      "end": "^---\\s*$",
+      "name": "meta.frontmatter.dox",
+      "contentName": "source.yaml.embedded.dox",
+      "beginCaptures": { "0": { "name": "punctuation.definition.frontmatter.begin.dox" } },
+      "endCaptures": { "0": { "name": "punctuation.definition.frontmatter.end.dox" } }
+    },
+    "spatial-block": {
+      "begin": "^---spatial\\b.*$",
+      "end": "^---/spatial\\s*$",
+      "name": "meta.spatial.dox",
+      "beginCaptures": { "0": { "name": "punctuation.definition.spatial.begin.dox" } },
+      "endCaptures": { "0": { "name": "punctuation.definition.spatial.end.dox" } },
+      "patterns": [
+        { "include": "#bbox" }
+      ]
+    },
+    "meta-block": {
+      "begin": "^---meta\\s*$",
+      "end": "^---/meta\\s*$",
+      "name": "meta.metadata.dox",
+      "contentName": "source.yaml.embedded.dox",
+      "beginCaptures": { "0": { "name": "punctuation.definition.meta.begin.dox" } },
+      "endCaptures": { "0": { "name": "punctuation.definition.meta.end.dox" } }
+    },
+    "table-block": {
+      "begin": "^\\|\\|\\|\\s*table\\b(.*)$",
+      "end": "^\\|\\|\\|\\s*$",
+      "name": "meta.table.dox",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.table.begin.dox" },
+        "1": { "name": "entity.other.attribute-name.dox" }
+      },
+      "endCaptures": { "0": { "name": "punctuation.definition.table.end.dox" } },
+      "patterns": [
+        {
+          "match": "\\|",
+          "name": "punctuation.separator.table.dox"
+        },
+        {
+          "match": "---+",
+          "name": "punctuation.separator.table-header.dox"
+        }
+      ]
+    },
+    "code-block": {
+      "begin": "^```(\\w*)\\s*$",
+      "end": "^```\\s*$",
+      "name": "meta.code.fenced.dox",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.code.begin.dox" },
+        "1": { "name": "entity.name.tag.language.dox" }
+      },
+      "endCaptures": { "0": { "name": "punctuation.definition.code.end.dox" } },
+      "contentName": "markup.raw.block.dox"
+    },
+    "inline-block": {
+      "match": "^::(\\w+)\\s+(.*?)::$",
+      "name": "meta.inline-block.dox",
+      "captures": {
+        "1": { "name": "entity.name.tag.dox" },
+        "2": { "name": "string.unquoted.attribute.dox" }
+      }
+    },
+    "math-block": {
+      "match": "\\$\\$(.*?)\\$\\$(\\s*\\{math:\\s*\\w+\\})?",
+      "name": "markup.math.dox",
+      "captures": {
+        "1": { "name": "constant.other.math.dox" },
+        "2": { "name": "comment.block.math-hint.dox" }
+      }
+    },
+    "cross-ref": {
+      "match": "\\[\\[ref:([^\\]]+)\\]\\]",
+      "name": "markup.underline.link.dox",
+      "captures": {
+        "1": { "name": "entity.name.tag.reference.dox" }
+      }
+    },
+    "figure": {
+      "match": "^!\\[([^\\]]*)\\]\\(([^)]+)\\)(\\s*\\{figure:.*?\\})?",
+      "name": "meta.figure.dox",
+      "captures": {
+        "1": { "name": "string.other.caption.dox" },
+        "2": { "name": "markup.underline.link.dox" },
+        "3": { "name": "entity.other.attribute-name.dox" }
+      }
+    },
+    "footnote": {
+      "match": "^\\[\\^(\\d+)\\]:\\s*(.+)$",
+      "name": "meta.footnote.dox",
+      "captures": {
+        "1": { "name": "constant.numeric.footnote-number.dox" },
+        "2": { "name": "string.other.footnote-text.dox" }
+      }
+    },
+    "heading": {
+      "match": "^(#{1,6})\\s+(.+)$",
+      "name": "markup.heading.dox",
+      "captures": {
+        "1": { "name": "punctuation.definition.heading.dox" },
+        "2": { "name": "entity.name.section.dox" }
+      }
+    },
+    "bbox": {
+      "match": "@\\[(\\d+),(\\d+),(\\d+),(\\d+)\\]",
+      "name": "constant.other.bbox.dox"
+    },
+    "bold": {
+      "match": "\\*\\*(.+?)\\*\\*",
+      "name": "markup.bold.dox"
+    },
+    "italic": {
+      "match": "(?<!\\*)\\*(?!\\*)(.+?)(?<!\\*)\\*(?!\\*)",
+      "name": "markup.italic.dox"
+    },
+    "inline-code": {
+      "match": "`([^`]+)`",
+      "name": "markup.raw.inline.dox"
+    },
+    "link": {
+      "match": "\\[([^\\]]+)\\]\\(([^)]+)\\)",
+      "name": "markup.underline.link.dox",
+      "captures": {
+        "1": { "name": "string.other.link.title.dox" },
+        "2": { "name": "markup.underline.link.dox" }
+      }
+    }
+  }
+}

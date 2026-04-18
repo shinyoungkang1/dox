@@ -1,0 +1,20 @@
+{
+  "name": "dox-format",
+  "version": "0.1.0",
+  "description": "Reference TypeScript implementation for .dox — Document Open eXchange Format",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/**/*.test.js",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": ["document", "intelligence", "ocr", "parsing", "markdown", "format"],
+  "devDependencies": {
+    "typescript": "^5.4"
+  },
+  "dependencies": {
+    "yaml": "^2.4"
+  }
+}

@@ -1,0 +1,126 @@
+---dox
+version: "1.0"
+source: fda-drug-approval-report-2025.pdf
+pages: 15
+lang: en
+---
+
+# FDA Drug Approval Report — FY2025
+
+## 1. Executive Summary
+
+The U.S. Food and Drug Administration approved **55 novel drugs** in fiscal year 2025, including 12 first-in-class therapies and 8 accelerated approvals. This report provides a comprehensive breakdown by therapeutic area, review pathway, and timeline statistics.
+
+## 2. Approvals by Therapeutic Area
+
+||| table id="t-therapeutic" caption="Table 1: Novel Drug Approvals by Therapeutic Area (FY2025)"
+| Therapeutic Area        | NMEs | BLAs | Total | First-in-Class | Orphan Drug | Breakthrough |
+|-------------------------|------|------|-------|----------------|-------------|--------------|
+| Oncology                | 12   | 3    | 15    | 4              | 8           | 6            |
+| Neurology               | 6    | 1    | 7     | 2              | 3           | 2            |
+| Immunology / Autoimmune | 5    | 2    | 7     | 1              | 2           | 3            |
+| Infectious Disease      | 4    | 1    | 5     | 2              | 1           | 1            |
+| Cardiology              | 3    | 1    | 4     | 1              | 0           | 2            |
+| Endocrinology           | 3    | 0    | 3     | 0              | 1           | 0            |
+| Rare Disease (Other)    | 2    | 2    | 4     | 1              | 4           | 2            |
+| Ophthalmology           | 2    | 1    | 3     | 0              | 2           | 1            |
+| Pulmonology             | 2    | 0    | 2     | 0              | 1           | 0            |
+| Dermatology             | 2    | 0    | 2     | 1              | 0           | 1            |
+| Other                   | 2    | 1    | 3     | 0              | 1           | 0            |
+| **TOTAL**               | **43** | **12** | **55** | **12**       | **23**      | **18**       |
+|||
+
+## 3. Review Pathway Analysis
+
+||| table id="t-pathway" caption="Table 2: Approval by Review Pathway"
+| Pathway              | Count | Median Review (months) | Range (months) |
+|----------------------|-------|------------------------|----------------|
+| Standard             | 22    | 11.2                   | 6.5 – 18.3     |
+| Priority Review      | 18    | 7.8                    | 4.2 – 12.1     |
+| Accelerated Approval | 8     | 6.5                    | 3.8 – 9.7      |
+| Fast Track           | 5     | 8.1                    | 5.1 – 11.4     |
+| Breakthrough Therapy | 2     | 5.2                    | 4.8 – 5.6      |
+|||
+
+## 4. Notable Approvals
+
+### 4.1 First-in-Class Therapies
+
+||| table id="t-firstclass" caption="Table 3: First-in-Class Approvals"
+| Drug Name       | Brand Name  | Indication                           | Mechanism of Action              | Approval Date |
+|-----------------|-------------|--------------------------------------|----------------------------------|---------------|
+| Velimostat      | Velixar     | Relapsed DLBCL                       | HDAC6-selective inhibitor        | 2025-01-28    |
+| Trosemtinib     | Trosentra   | NRAS-mutant melanoma                 | SHP2 allosteric inhibitor        | 2025-03-15    |
+| Lunacaftor      | LunaGel     | Atopic dermatitis (moderate-severe)  | JAK1/TYK2 dual inhibitor (topical) | 2025-04-22 |
+| Orvotamab       | OrvoBridge  | HER2-low breast cancer               | Bispecific T-cell engager        | 2025-05-10    |
+| Cebranostat     | CebraClear  | Primary biliary cholangitis          | FXR inverse agonist              | 2025-06-18    |
+| Quilsinertide   | QuilNova    | Treatment-resistant depression       | NMDAR modulator (GluN2B-specific)| 2025-07-03    |
+| Nexovitug       | NexoVax     | RSV prophylaxis (adults ≥60)         | Prefusion F-protein mAb          | 2025-08-14    |
+| Dravalutamide   | DravaProst  | mCRPC (post-enzalutamide)            | AR degrader (PROTAC)             | 2025-09-22    |
+| Betaxomer       | BetaFluid   | Chronic heart failure (HFpEF)        | sGC stimulator (oral)            | 2025-10-05    |
+| Calzenimab      | CalZenith   | Anti-NMDAR encephalitis              | IL-6R × CD19 bispecific          | 2025-10-31    |
+| Prixosentan     | PrixoLung   | Pulmonary arterial hypertension      | ET-A/AT1 dual antagonist         | 2025-11-19    |
+| Umbravecept     | UmbraShield | Geographic atrophy (dry AMD)         | C3 convertase trap (intravitreal)| 2025-12-08    |
+|||
+
+### 4.2 Accelerated Approvals Requiring Confirmatory Trials
+
+||| table id="t-accelerated" caption="Table 4: Accelerated Approvals with Pending Confirmatory Data"
+| Drug              | Indication               | Surrogate Endpoint         | Confirmatory Trial | Expected Completion |
+|-------------------|--------------------------|----------------------------|--------------------|---------------------|
+| Velimostat        | Relapsed DLBCL           | ORR (42%)                  | VELI-301 Phase III | Q2 2027             |
+| Orvotamab         | HER2-low breast cancer   | ORR (38%), DoR 8.2 mo     | ORVO-CONFIRM       | Q4 2027             |
+| Dravalutamide     | mCRPC post-enzalutamide  | rPFS (7.8 mo vs 3.2 mo)   | DRAVA-OS           | Q1 2028             |
+| Compound X-4892   | Refractory AML           | CR+CRi rate (31%)         | AML-CONFIRM-4892   | Q3 2027             |
+| Compound Z-7123   | Advanced cholangiocarcinoma | ORR (29%), mDOR 11.1 mo | CHOL-VERIFY-7123   | Q2 2028             |
+|||
+
+## 5. Safety Signals & Post-Market Actions
+
+- **3 new REMS programs** established (Velimostat, Quilsinertide, Compound X-4892)
+- **2 boxed warnings** added post-approval (hepatotoxicity signals in Phase IV data)
+- **1 voluntary market withdrawal** (Compound Y-5501, confirmed cardiac safety signal)
+
+||| table id="t-safety" caption="Table 5: Notable Post-Market Safety Actions"
+| Drug            | Action                  | Date       | Reason                                      |
+|-----------------|-------------------------|------------|----------------------------------------------|
+| Velimostat      | REMS established        | 2025-02-15 | Thrombocytopenia risk management              |
+| Quilsinertide   | REMS established        | 2025-07-20 | Dissociative effects monitoring               |
+| Compound X-4892 | REMS established        | 2025-09-01 | Differentiation syndrome                      |
+| Lunacaftor      | Boxed warning added     | 2025-11-01 | Hepatotoxicity (3 cases in Phase IV, 1 fatal) |
+| Compound Y-5501 | Voluntary withdrawal    | 2025-12-20 | QT prolongation confirmed in Phase IV         |
+|||
+
+## 6. Methodology
+
+Data were compiled from FDA's Drugs@FDA database, ClinicalTrials.gov, and FDA press releases. Review timelines are calculated from NDA/BLA submission date to approval date. First-in-class designations follow FDA's definition: the drug uses a novel mechanism of action not previously approved.
+
+$$\text{Median Review Time} = \text{median}(\{t_{\text{approval}} - t_{\text{submission}} \mid \text{all NMEs in FY2025}\})$$ {math: latex}
+
+::chart type="bar" data-ref="t-therapeutic" x="Therapeutic Area" y="Total"::
+
+::chart type="line" data-ref="t-pathway" x="Pathway" y="Median Review (months)"::
+
+[^1]: NME = New Molecular Entity; BLA = Biologics License Application; DLBCL = Diffuse Large B-Cell Lymphoma; mCRPC = Metastatic Castration-Resistant Prostate Cancer.
+
+---meta
+extracted_by: mistral-ocr-3 + dox-exporter-0.1.0
+extracted_at: "2026-04-10T17:00:00Z"
+confidence:
+  overall: 0.96
+  t-therapeutic: 0.99
+  t-pathway: 0.98
+  t-firstclass: 0.94
+  t-accelerated: 0.93
+  t-safety: 0.97
+provenance:
+  source_hash: "sha256:abcdef123456789..."
+  extraction_pipeline:
+    - "ocr:mistral-ocr-3"
+    - "table:mistral-table-v2"
+    - "layout:mistral-layout-v1"
+version_history:
+  - ts: "2026-04-10T17:00:00Z"
+    agent: "mistral-ocr-3"
+    action: "initial_extraction"
+---/meta

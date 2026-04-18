@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+
+# Local test artifacts
+test_output.docx
+test_output.pdf
+test_report.pdf
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/

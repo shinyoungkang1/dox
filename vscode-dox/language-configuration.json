@@ -1,0 +1,32 @@
+{
+  "comments": {},
+  "brackets": [
+    ["[", "]"],
+    ["(", ")"],
+    ["{", "}"]
+  ],
+  "autoClosingPairs": [
+    { "open": "[", "close": "]" },
+    { "open": "(", "close": ")" },
+    { "open": "{", "close": "}" },
+    { "open": "\"", "close": "\"" },
+    { "open": "`", "close": "`" },
+    { "open": "$$", "close": "$$" },
+    { "open": "::", "close": "::" }
+  ],
+  "surroundingPairs": [
+    ["[", "]"],
+    ["(", ")"],
+    ["{", "}"],
+    ["\"", "\""],
+    ["`", "`"],
+    ["*", "*"],
+    ["**", "**"]
+  ],
+  "folding": {
+    "markers": {
+      "start": "^(---dox|---spatial|---meta|\\|\\|\\| table|```).*$",
+      "end": "^(---|---/spatial|---/meta|\\|\\|\\||```)\\s*$"
+    }
+  }
+}

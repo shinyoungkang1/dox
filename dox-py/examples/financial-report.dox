@@ -1,0 +1,82 @@
+---dox
+version: "1.0"
+source: annual-report-2025.pdf
+pages: 42
+lang: en
+---
+
+# Q3 Financial Results
+
+Revenue increased by **15%** compared to last year, driven by
+strong performance in the APAC region.
+
+## Regional Sales
+
+||| table id="t1" caption="Table 1: Regional Sales ($M)"
+| Region   | Q3 2024 | Q3 2025 | Delta % |
+|----------|---------|---------|---------|
+| Americas | 105     | 120     | +14.3   |
+| Europe   | 88      | 95      | +8.0    |
+| APAC     | 62      | 80      | +29.0   |
+|||
+
+Revenue was calculated using $$E = mc^2$$ {math: latex}.
+
+::form field="approved" type="checkbox" value="true"::
+
+::chart type="bar" data-ref="t1" x="Region" y="Q3 2025"::
+
+## Operating Expenses
+
+||| table id="t2" caption="Table 2: OpEx by Category ($M)"
+| Category | Q3 2024 | Q3 2025 | Delta % |
+|----------|---------|---------|---------|
+| R&D      | 45      | 52      | +15.6   |
+| S&M      | 38      | 41      | +7.9    |
+| G&A      | 22      | 24      | +9.1    |
+|||
+
+## Notes
+
+- APAC growth driven by new partnerships in Southeast Asia
+- R&D investment focused on AI-powered document intelligence
+- Guidance for Q4 raised to $310M revenue target
+
+![Quarterly Revenue Trend](figures/revenue-trend.png) {figure: id="f1"}
+
+::annotation type="handwriting" confidence=0.82 text="Approved - JS"::
+
+[^1]: All figures in USD millions unless otherwise noted.
+
+---spatial page=1 grid=1000x1000
+# Q3 Financial Results          @[45,62,520,95]
+Revenue increased by **15%**... @[45,120,890,145]
+||| table id="t1"               @[45,180,890,380]
+  | Americas | 105 | 120 |      @[45,220,890,245] cells=[@[45,220,200,245], @[220,220,400,245], @[400,220,600,245], @[600,220,890,245]]
+|||
+---/spatial
+
+---meta
+extracted_by: docling-2.72.0 + granite-docling-258m
+extracted_at: "2026-04-10T14:30:00Z"
+confidence:
+  overall: 0.97
+  t1: 0.99
+  t2: 0.95
+  f1: 0.94
+  page_1_para_2: 0.88
+provenance:
+  source_hash: "sha256:a1b2c3d4e5f6..."
+  extraction_pipeline:
+    - "ocr:easyocr"
+    - "layout:doclaynet"
+    - "table:tableformer"
+    - "vlm:granite-docling"
+version_history:
+  - ts: "2026-04-10T14:30:00Z"
+    agent: docling
+    action: initial_extraction
+  - ts: "2026-04-10T15:12:00Z"
+    agent: "human:jdoe"
+    action: "corrected t1 row 2"
+---/meta
