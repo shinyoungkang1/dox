@@ -109,12 +109,18 @@ def _element_to_dict(element: Element) -> dict[str, Any]:
         base["table_id"] = element.table_id
         base["caption"] = element.caption
         base["nested"] = element.nested
+        if element.page_range:
+            base["page_range"] = list(element.page_range)
+        if element.continuation_of:
+            base["continuation_of"] = element.continuation_of
         base["rows"] = [
             {
                 "is_header": row.is_header,
+                "bbox": row.bbox.to_list() if row.bbox else None,
                 "cells": [
                     {
                         "text": cell.text,
+                        "bbox": cell.bbox.to_list() if cell.bbox else None,
                         "is_header": cell.is_header,
                         "colspan": cell.colspan,
                         "rowspan": cell.rowspan,
@@ -143,6 +149,8 @@ def _element_to_dict(element: Element) -> dict[str, Any]:
         base["data_ref"] = element.data_ref
         base["x_field"] = element.x_field
         base["y_field"] = element.y_field
+        if element.extra:
+            base["extra"] = element.extra
 
     elif isinstance(element, Annotation):
         base["annotation_type"] = element.annotation_type
@@ -167,6 +175,7 @@ def _element_to_dict(element: Element) -> dict[str, Any]:
 
     elif isinstance(element, ListBlock):
         base["ordered"] = element.ordered
+        base["start"] = element.start
         items_list = []
         for it in element.items:
             item_dict = {"text": it.text}

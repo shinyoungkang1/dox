@@ -527,7 +527,7 @@ class TestFormatComparison:
         print(f"\n  CROSS-PAGE MERGING:")
         print(f"    .dox:     supported (continuation_of, page_range)")
         print(f"    Markdown: impossible (no cross-page concept)")
-        print(f"    JSON:     possible (with custom fields)")
+        print(f"    JSON:     supported (continuation_of, page_range)")
 
         print(f"\n  HUMAN READABILITY:")
         print(f"    .dox:     ★★★★★ (enhanced Markdown, readable as-is)")

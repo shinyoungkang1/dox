@@ -149,6 +149,13 @@ def _element_schema() -> dict[str, Any]:
         "table_id": {"type": ["string", "null"]},
         "caption": {"type": ["string", "null"]},
         "nested": {"type": "boolean"},
+        "page_range": {
+            "type": ["array", "null"],
+            "items": {"type": "integer", "minimum": 1},
+            "minItems": 2,
+            "maxItems": 2,
+        },
+        "continuation_of": {"type": ["string", "null"]},
         "rows": {"type": "array", "items": {"$ref": "#/$defs/tableRow"}},
         # CodeBlock
         "language": {"type": ["string", "null"]},
@@ -158,6 +165,7 @@ def _element_schema() -> dict[str, Any]:
         "display_mode": {"type": "boolean"},
         # ListBlock
         "ordered": {"type": "boolean"},
+        "start": {"type": "integer", "minimum": 1},
         "items": {"type": "array", "items": {"$ref": "#/$defs/listItem"}},
         # Figure
         "source": {"type": "string"},
@@ -181,6 +189,7 @@ def _element_schema() -> dict[str, Any]:
         "data_ref": {"type": ["string", "null"]},
         "x_field": {"type": ["string", "null"]},
         "y_field": {"type": ["string", "null"]},
+        "extra": {"type": "object"},
         # Annotation
         "annotation_type": {"type": "string"},
         # CrossRef
@@ -311,6 +320,7 @@ def _table_row_schema() -> dict[str, Any]:
         "type": "object",
         "properties": {
             "is_header": {"type": "boolean", "default": False},
+            "bbox": {"anyOf": [{"$ref": "#/$defs/bbox"}, {"type": "null"}]},
             "cells": {
                 "type": "array",
                 "items": {"$ref": "#/$defs/tableCell"},
@@ -325,6 +335,7 @@ def _table_cell_schema() -> dict[str, Any]:
         "type": "object",
         "properties": {
             "text": {"type": "string"},
+            "bbox": {"anyOf": [{"$ref": "#/$defs/bbox"}, {"type": "null"}]},
             "is_header": {"type": "boolean", "default": False},
             "colspan": {"type": "integer", "minimum": 1, "default": 1},
             "rowspan": {"type": "integer", "minimum": 1, "default": 1},

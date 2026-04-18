@@ -61,9 +61,9 @@ Acceptance:
 
 - [x] Make README syntax match parser and serializer behavior
 - [x] Align schema with actual canonical fields
-- [ ] Decide whether canonical JSON is lossless or intentionally lightweight
+- [x] Decide that canonical JSON is lossless rather than lightweight-only
 - [x] If JSON is canonical, include fields required for full round-trip
-- [ ] If JSON is lightweight, document that distinction explicitly
+- [x] Document that JSON is intended as the canonical machine representation
 
 Acceptance:
 

@@ -5,17 +5,22 @@ from __future__ import annotations
 from dox.converters.to_json import to_dict
 from dox.models.document import DoxDocument, Frontmatter
 from dox.models.elements import (
+    BoundingBox,
+    Chart,
     CodeBlock,
     CrossRef,
     Figure,
     FormField,
     FormFieldType,
     KeyValuePair,
+    ListBlock,
+    ListItem,
     Paragraph,
     Table,
     TableCell,
     TableRow,
 )
+from dox.schema import generate_schema
 from dox.parsers.parser import DoxParser
 from dox.serializer import DoxSerializer
 from dox.validator import DoxValidator
@@ -207,3 +212,73 @@ def test_json_includes_figure_image_data_when_present():
     figure = data["elements"][0]
     assert figure["image_type"] == "logo"
     assert figure["image_data"] == "aGVsbG8="
+
+
+def test_json_includes_table_range_continuation_and_bboxes():
+    doc = DoxDocument(
+        frontmatter=Frontmatter(version="1.0"),
+        elements=[
+            Table(
+                table_id="t1_cont",
+                page_range=(1, 2),
+                continuation_of="t1",
+                rows=[
+                    TableRow(
+                        bbox=BoundingBox(0, 0, 100, 50),
+                        cells=[
+                            TableCell(
+                                text="A",
+                                bbox=BoundingBox(0, 0, 50, 50),
+                                colspan=2,
+                            ),
+                            TableCell(text="B"),
+                        ],
+                    )
+                ],
+            )
+        ],
+    )
+
+    table = to_dict(doc)["elements"][0]
+    assert table["page_range"] == [1, 2]
+    assert table["continuation_of"] == "t1"
+    assert table["rows"][0]["bbox"] == [0, 0, 100, 50]
+    assert table["rows"][0]["cells"][0]["bbox"] == [0, 0, 50, 50]
+
+
+def test_json_includes_list_start_and_chart_extra():
+    doc = DoxDocument(
+        frontmatter=Frontmatter(version="1.0"),
+        elements=[
+            ListBlock(
+                ordered=True,
+                start=5,
+                items=[ListItem(text="First"), ListItem(text="Second")],
+            ),
+            Chart(
+                chart_type="scatter",
+                x_field="x",
+                y_field="y",
+                extra={"color": "red", "legend": "Series A"},
+            ),
+        ],
+    )
+
+    data = to_dict(doc)["elements"]
+    list_block = data[0]
+    chart = data[1]
+    assert list_block["start"] == 5
+    assert chart["extra"] == {"color": "red", "legend": "Series A"}
+
+
+def test_schema_includes_canonical_json_fields():
+    props = generate_schema()["$defs"]["element"]["properties"]
+    row_props = generate_schema()["$defs"]["tableRow"]["properties"]
+    cell_props = generate_schema()["$defs"]["tableCell"]["properties"]
+
+    assert "page_range" in props
+    assert "continuation_of" in props
+    assert "start" in props
+    assert "extra" in props
+    assert "bbox" in row_props
+    assert "bbox" in cell_props

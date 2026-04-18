@@ -139,7 +139,7 @@ text = DoxSerializer().serialize(doc)
 from dox.converters import to_html, to_json, to_markdown
 
 html = to_html(doc, standalone=True)   # Full HTML page with styles
-json_str = to_json(doc)                # Structured JSON
+json_str = to_json(doc)                # Canonical structured JSON
 md = to_markdown(doc)                  # Clean Markdown
 
 # Binary formats (optional dependencies)
@@ -149,6 +149,8 @@ from dox.converters.to_pdf import to_pdf
 to_docx(doc, "report.docx")           # pip install 'dox-format[docx]'
 to_pdf(doc, "report.pdf")             # pip install 'dox-format[pdf]'
 ```
+
+`to_json()` is intended to be the canonical machine-readable representation of a `DoxDocument`, not a lightweight summary export.
 
 ### Chunk for RAG
 
