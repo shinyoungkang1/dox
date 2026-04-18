@@ -65,7 +65,6 @@ _SEPARATOR_RE = re.compile(r"^[\s|:-]+$")
 _MATH_BLOCK_RE = re.compile(
     r"\$\$(.*?)\$\$\s*(\{([^}]*)\})?", re.DOTALL
 )
-_INLINE_BLOCK_RE = re.compile(r"^::(\w+)(?:\s+(.*?))?::\s*(\{[^}]*\})?\s*$")
 _CODE_FENCE_START_RE = re.compile(r"^```(?:([^\s{]+))?(?:\s+(\{.*\}))?\s*$")
 _CODE_FENCE_END_RE = re.compile(r"^```\s*$")
 _CROSS_REF_RE = re.compile(r"^\[\[ref:([^\]]+)\]\]\s*(\{[^}]*\})?\s*$")
@@ -81,8 +80,6 @@ _KV_RE = re.compile(r'^::kv\s+(.+?)::$')
 _QUOTED_ATTR_RE = re.compile(r'([\w-]+)="((?:\\.|[^"\\])*)"')
 _UNQUOTED_ATTR_RE = re.compile(r'([\w-]+)=([^\s]+)')
 
-# Inline element metadata: {page: 3, id: "el-1", confidence: 0.95}
-_ELEMENT_META_RE = re.compile(r'\s*\{([^}]*)\}\s*$')
 _META_PAGE_RE = re.compile(r'page\s*[:=]\s*"?(?P<value>\d+)"?')
 _META_ID_RE = re.compile(r'(?:^|[\s,])id\s*[:=]\s*"((?:\\.|[^"\\])*)"')
 _META_CONFIDENCE_RE = re.compile(r'confidence\s*[:=]\s*"?(?P<value>[\d.]+)"?')
@@ -185,17 +182,20 @@ def _extract_element_meta(text: str) -> tuple[str, dict]:
     Returns (clean_text, meta_dict) where meta_dict may contain
     canonical element metadata fields.
     """
-    meta: dict = {}
-    m = _ELEMENT_META_RE.search(text)
-    if not m:
-        return text, meta
+    stripped = text.rstrip()
+    if not stripped.endswith("}"):
+        return text, {}
 
-    meta_str = m.group(1)
+    meta_start = stripped.rfind("{")
+    if meta_start < 0:
+        return text, {}
+
+    meta_str = stripped[meta_start + 1:-1]
     meta = _parse_meta_string(meta_str)
     if not meta:
-        return text, meta
+        return text, {}
 
-    clean = text[:m.start()]
+    clean = stripped[:meta_start].rstrip()
     return clean, meta
 
 
@@ -229,6 +229,55 @@ def _parse_attrs(attrs_str: str) -> dict[str, str]:
         if key not in attrs:
             attrs[key] = val
     return attrs
+
+
+def _split_inline_block(line: str) -> tuple[str, str, str | None] | None:
+    """Split ::type ...:: {meta} blocks while respecting quoted attribute text."""
+    if not line.startswith("::"):
+        return None
+
+    i = 2
+    while i < len(line) and (line[i].isalnum() or line[i] == "_"):
+        i += 1
+    if i == 2:
+        return None
+
+    block_type = line[2:i]
+    attrs = ""
+
+    if line[i:i + 2] == "::":
+        end = i
+    else:
+        if i >= len(line) or not line[i].isspace():
+            return None
+        while i < len(line) and line[i].isspace():
+            i += 1
+        attr_start = i
+        in_quotes = False
+        escaping = False
+        end = -1
+        while i < len(line) - 1:
+            ch = line[i]
+            if escaping:
+                escaping = False
+            elif ch == "\\":
+                escaping = True
+            elif ch == '"':
+                in_quotes = not in_quotes
+            elif not in_quotes and line[i:i + 2] == "::":
+                end = i
+                attrs = line[attr_start:i]
+                break
+            i += 1
+        if end < 0:
+            return None
+
+    rest = line[end + 2:].strip()
+    if not rest:
+        return block_type, attrs, None
+    if rest.startswith("{") and rest.endswith("}"):
+        return block_type, attrs, rest
+    return None
 
 
 class DoxParser:
@@ -451,11 +500,9 @@ class DoxParser:
                 continue
 
             # Inline blocks: ::type attrs::
-            inline_match = _INLINE_BLOCK_RE.match(stripped)
-            if inline_match:
-                block_type = inline_match.group(1)
-                attrs_str = inline_match.group(2) or ""
-                meta_group = inline_match.group(3)
+            inline_block = _split_inline_block(stripped)
+            if inline_block:
+                block_type, attrs_str, meta_group = inline_block
                 if block_type == "list":
                     attrs = _parse_attrs(attrs_str)
                     meta = _parse_meta_string(meta_group[1:-1]) if meta_group and meta_group.startswith("{") else {}
@@ -641,7 +688,7 @@ class DoxParser:
                     or _BLOCKQUOTE_RE.match(ln)
                     or _TABLE_START_RE.match(ln)
                     or _CODE_FENCE_START_RE.match(ln)
-                    or _INLINE_BLOCK_RE.match(ln)
+                    or _split_inline_block(ln) is not None
                     or _CROSS_REF_RE.match(ln)
                     or _FIGURE_RE.match(ln)
                     or _FOOTNOTE_DEF_RE.match(ln)
