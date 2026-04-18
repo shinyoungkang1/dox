@@ -326,6 +326,26 @@ class DoxSerializer:
     def _serialize_list(self, lb: ListBlock) -> str:
         lines: list[str] = []
         start = lb.start if lb.start is not None else 1
+        meta = self._element_meta(lb)
+        needs_header = (
+            not lb.items
+            or lb.start != 1
+            or bool(meta)
+        )
+
+        if needs_header:
+            attrs: list[str] = []
+            _append_attr(attrs, "ordered", lb.ordered)
+            if lb.ordered:
+                _append_attr(attrs, "start", start)
+            header = "::list"
+            if attrs:
+                header += " " + " ".join(attrs)
+            header += "::"
+            if meta:
+                header += meta
+            lines.append(header)
+
         for idx, item in enumerate(lb.items):
             marker = f"{start + idx}." if lb.ordered else "-"
             # Emit task-list syntax if checked is not None
@@ -335,8 +355,8 @@ class DoxSerializer:
             else:
                 lines.append(f"{marker} {item.text}")
             # Handle nested items (2-level nesting)
-            for child in item.children:
-                child_marker = f"  {start + idx + 1}." if lb.ordered else "  -"
+            for child_idx, child in enumerate(item.children, start=1):
+                child_marker = f"  {child_idx}." if lb.ordered else "  -"
                 if child.checked is not None:
                     checkbox = "[x]" if child.checked else "[ ]"
                     lines.append(f"{child_marker} {checkbox} {child.text}")

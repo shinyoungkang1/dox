@@ -96,8 +96,8 @@ def to_markdown(doc: DoxDocument) -> str:
                 else:
                     parts.append(f"{marker} {item.text}")
                 # Handle nested items
-                for child in item.children:
-                    child_marker = f"{element.start + idx + 1}." if element.ordered else "-"
+                for child_idx, child in enumerate(item.children, start=1):
+                    child_marker = f"{child_idx}." if element.ordered else "-"
                     if child.checked is not None:
                         checkbox = "[x]" if child.checked else "[ ]"
                         parts.append(f"  {child_marker} {checkbox} {child.text}")

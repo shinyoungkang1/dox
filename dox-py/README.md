@@ -210,7 +210,7 @@ dox render report.dox -f pdf              # Styled PDF output
 | **Table** | `\|\|\| table ... \|\|\|` with pipe rows | Data tables with colspan/rowspan |
 | **CodeBlock** | ` ```lang ... ``` ` | Source code with syntax hints |
 | **MathBlock** | `$$expression$$` | LaTeX math (inline + display) |
-| **ListBlock** | `- item` / `1. item` / `- [x] item` | Lists, nested lists, task lists |
+| **ListBlock** | `- item` / `1. item` / `- [x] item` / optional `::list ...::` preamble | Lists, nested lists, task lists, metadata-rich or custom-start lists |
 | **Blockquote** | `> text` | Quoted content |
 | **HorizontalRule** | `---` / `***` / `___` | Thematic breaks |
 | **Figure** | `![caption](source)` | Images with captions |

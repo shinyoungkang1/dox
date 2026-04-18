@@ -65,7 +65,7 @@ _SEPARATOR_RE = re.compile(r"^[\s|:-]+$")
 _MATH_BLOCK_RE = re.compile(
     r"\$\$(.*?)\$\$\s*(\{([^}]*)\})?", re.DOTALL
 )
-_INLINE_BLOCK_RE = re.compile(r"^::(\w+)\s+(.*?)::\s*(\{[^}]*\})?\s*$")
+_INLINE_BLOCK_RE = re.compile(r"^::(\w+)(?:\s+(.*?))?::\s*(\{[^}]*\})?\s*$")
 _CODE_FENCE_START_RE = re.compile(r"^```(?:([^\s{]+))?(?:\s+(\{.*\}))?\s*$")
 _CODE_FENCE_END_RE = re.compile(r"^```\s*$")
 _CROSS_REF_RE = re.compile(r"^\[\[ref:([^\]]+)\]\]\s*(\{[^}]*\})?\s*$")
@@ -453,8 +453,51 @@ class DoxParser:
             # Inline blocks: ::type attrs::
             inline_match = _INLINE_BLOCK_RE.match(stripped)
             if inline_match:
+                block_type = inline_match.group(1)
+                attrs_str = inline_match.group(2) or ""
+                meta_group = inline_match.group(3)
+                if block_type == "list":
+                    attrs = _parse_attrs(attrs_str)
+                    meta = _parse_meta_string(meta_group[1:-1]) if meta_group and meta_group.startswith("{") else {}
+                    next_i = i + 1
+                    has_list_body = (
+                        next_i < len(lines)
+                        and (
+                            _LIST_RE.match(lines[next_i])
+                            or _TASK_LIST_RE.match(lines[next_i])
+                        )
+                    )
+                    if has_list_body:
+                        items, next_i = self._parse_list(lines, next_i)
+                        first_body = lines[i + 1]
+                        first_task = _TASK_LIST_RE.match(first_body)
+                        first_list = _LIST_RE.match(first_body)
+                        parsed_ordered = bool(first_list and re.match(r"\d+\.", first_list.group(2)))
+                        parsed_start = (
+                            _safe_int(first_list.group(2)[:-1], default=1)
+                            if parsed_ordered and first_list
+                            else 1
+                        )
+                    else:
+                        items = []
+                        next_i = i + 1
+                        parsed_ordered = False
+                        parsed_start = 1
+
+                    ordered = _safe_bool(attrs.get("ordered"), default=parsed_ordered)
+                    start_value = (
+                        _safe_int(attrs.get("start"), default=parsed_start)
+                        if ordered
+                        else 1
+                    )
+                    el = ListBlock(items=items, ordered=ordered, start=max(start_value, 1))
+                    _apply_meta(el, meta)
+                    doc.add_element(el)
+                    i = next_i
+                    continue
+
                 el = self._parse_inline_block(
-                    inline_match.group(1), inline_match.group(2), inline_match.group(3)
+                    block_type, attrs_str, meta_group
                 )
                 if el:
                     doc.add_element(el)
@@ -518,7 +561,8 @@ class DoxParser:
             if list_match:
                 items, i = self._parse_list(lines, i)
                 ordered = bool(re.match(r"\d+\.", list_match.group(2)))
-                doc.add_element(ListBlock(items=items, ordered=ordered))
+                start_value = _safe_int(list_match.group(2)[:-1], default=1) if ordered else 1
+                doc.add_element(ListBlock(items=items, ordered=ordered, start=max(start_value, 1)))
                 continue
 
             # Math block - check for multi-line first ($$...$$)
@@ -705,10 +749,10 @@ class DoxParser:
     def _parse_inline_block(
         self,
         block_type: str,
-        attrs_str: str,
+        attrs_str: str | None,
         meta_group: str | None = None,
     ) -> Element | None:
-        attrs = _parse_attrs(attrs_str)
+        attrs = _parse_attrs(attrs_str or "")
         meta = _parse_meta_string(meta_group[1:-1]) if meta_group and meta_group.startswith("{") else {}
         element: Element | None = None
 

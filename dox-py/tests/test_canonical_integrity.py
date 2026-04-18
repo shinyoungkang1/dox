@@ -282,3 +282,100 @@ def test_schema_includes_canonical_json_fields():
     assert "extra" in props
     assert "bbox" in row_props
     assert "bbox" in cell_props
+
+
+def test_plain_ordered_list_roundtrip_preserves_start_number():
+    text = """---dox
+version: "1.0"
+---
+
+5. First
+6. Second
+"""
+
+    parsed = DoxParser().parse(text)
+    list_block = parsed.elements[0]
+    assert isinstance(list_block, ListBlock)
+    assert list_block.ordered is True
+    assert list_block.start == 5
+
+    serialized = DoxSerializer().serialize(parsed)
+    reparsed = DoxParser().parse(serialized)
+    list_block2 = reparsed.elements[0]
+    assert list_block2.start == 5
+
+
+def test_list_preamble_roundtrip_preserves_metadata():
+    doc = DoxDocument(
+        frontmatter=Frontmatter(version="1.0"),
+        elements=[
+            ListBlock(
+                items=[ListItem(text="Alpha"), ListItem(text="Beta")],
+                ordered=False,
+                page=2,
+                element_id="list-1",
+                reading_order=9,
+                lang="en",
+                is_furniture=True,
+            )
+        ],
+    )
+
+    text = DoxSerializer().serialize(doc)
+    assert "::list ordered=false::" in text
+
+    parsed = DoxParser().parse(text)
+    list_block = parsed.elements[0]
+    assert isinstance(list_block, ListBlock)
+    assert list_block.page == 2
+    assert list_block.element_id == "list-1"
+    assert list_block.reading_order == 9
+    assert list_block.lang == "en"
+    assert list_block.is_furniture is True
+
+
+def test_empty_list_roundtrip_uses_explicit_preamble():
+    doc = DoxDocument(
+        frontmatter=Frontmatter(version="1.0"),
+        elements=[
+            ListBlock(
+                items=[],
+                ordered=True,
+                start=3,
+                element_id="empty-list",
+            )
+        ],
+    )
+
+    text = DoxSerializer().serialize(doc)
+    assert "::list ordered=true start=\"3\"::" in text
+
+    parsed = DoxParser().parse(text)
+    list_block = parsed.elements[0]
+    assert isinstance(list_block, ListBlock)
+    assert list_block.items == []
+    assert list_block.ordered is True
+    assert list_block.start == 3
+    assert list_block.element_id == "empty-list"
+
+
+def test_ordered_list_nested_children_are_numbered_sequentially():
+    doc = DoxDocument(
+        frontmatter=Frontmatter(version="1.0"),
+        elements=[
+            ListBlock(
+                ordered=True,
+                start=5,
+                items=[
+                    ListItem(
+                        text="Parent",
+                        children=[ListItem(text="Child A"), ListItem(text="Child B")],
+                    )
+                ],
+            )
+        ],
+    )
+
+    text = DoxSerializer().serialize(doc)
+    assert "  1. Child A" in text
+    assert "  2. Child B" in text
