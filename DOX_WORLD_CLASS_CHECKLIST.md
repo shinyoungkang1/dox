@@ -94,7 +94,7 @@ Acceptance:
 - [ ] Add golden fixtures for invoices, reports, scientific PDFs, forms, and slide-like docs
 - [ ] Benchmark `.dox` fidelity against public parser gold on hard pages
 - [ ] Track loss rates for tables, figures, math, footnotes, and metadata separately
-- [ ] Add a documented compatibility policy for format evolution
+- [x] Add a documented compatibility policy for format evolution
 
 ## Current Execution Order
 

@@ -8,6 +8,7 @@ This repository currently contains:
 - `dox-js`: the JavaScript package
 - `vscode-dox`: editor support for `.dox`
 - `DOX_WORLD_CLASS_CHECKLIST.md`: the current hardening roadmap and completed work log
+- `FORMAT_COMPATIBILITY_POLICY.md`: rules for evolving the format without breaking stored data and downstream tools
 
 ## Current focus
 
