@@ -83,10 +83,10 @@ Acceptance:
 
 ## P2 Format Hardening
 
-- [ ] Expand code fence language parsing beyond `\\w*`
+- [x] Expand code fence language parsing beyond `\\w*`
 - [x] Audit list metadata strategy and decide whether lists get canonical block metadata
 - [x] Audit page-break metadata semantics and whether they should carry element metadata at all
-- [ ] Review converters for assumptions that break on newly preserved fields
+- [x] Review converters for assumptions that break on newly preserved fields
 - [ ] Add fuzz-style tests for escaping and mixed-content fixtures
 
 ## P2 Enterprise Readiness

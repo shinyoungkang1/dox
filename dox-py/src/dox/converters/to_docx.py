@@ -27,6 +27,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from dox.converters._figure_utils import figure_binary_source
 from dox.models.document import DoxDocument
 
 logger = logging.getLogger(__name__)
@@ -350,21 +351,18 @@ def _add_math_block(word_doc: Any, element: MathBlock) -> None:
 def _add_figure(word_doc: Any, element: Figure) -> None:
     from docx.shared import Inches
 
-    # Try to embed image if file exists
-    source = element.source or ""
-    img_path = Path(source)
-
-    if img_path.exists() and img_path.suffix.lower() in ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff'):
+    image_source, label = figure_binary_source(element)
+    if image_source is not None:
         try:
-            word_doc.add_picture(str(img_path), width=Inches(5))
+            word_doc.add_picture(image_source, width=Inches(5))
         except Exception:
             # Fallback to placeholder
             p = word_doc.add_paragraph()
-            run = p.add_run(f"[Image: {source}]")
+            run = p.add_run(f"[Image: {label}]")
             run.italic = True
     else:
         p = word_doc.add_paragraph()
-        run = p.add_run(f"[Image: {source}]")
+        run = p.add_run(f"[Image: {label}]")
         run.italic = True
 
     # Caption

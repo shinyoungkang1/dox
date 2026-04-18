@@ -1,10 +1,16 @@
 """Tests for .dox converters (Markdown, HTML, JSON)."""
 
+import base64
 import json
+import zipfile
+from io import BytesIO
+
 import pytest
 
-from dox.converters import to_html, to_json, to_markdown
+from dox.converters import to_docx_bytes, to_html, to_json, to_markdown, to_pdf_bytes
 from dox.converters.to_json import to_dict
+from dox.models.document import DoxDocument, Frontmatter
+from dox.models.elements import Figure
 from dox.parsers.parser import DoxParser
 
 
@@ -98,6 +104,40 @@ class TestHTMLConverter:
         html = to_html(doc)
         assert "<strong>bold</strong>" in html
 
+    def test_embedded_figure_uses_data_uri(self):
+        doc = DoxDocument(
+            frontmatter=Frontmatter(version="1.0"),
+            elements=[
+                Figure(
+                    caption="Embedded",
+                    source="",
+                    image_data=_tiny_png_b64(),
+                )
+            ],
+        )
+        html = to_html(doc, standalone=False)
+        assert "data:image/png;base64," in html
+
+
+class TestBinaryFigureConverters:
+    def test_docx_embeds_image_data(self):
+        doc = DoxDocument(
+            frontmatter=Frontmatter(version="1.0"),
+            elements=[Figure(caption="Embedded", source="", image_data=_tiny_png_b64())],
+        )
+        data = to_docx_bytes(doc)
+        with zipfile.ZipFile(BytesIO(data)) as zf:
+            media_files = [name for name in zf.namelist() if name.startswith("word/media/")]
+        assert media_files
+
+    def test_pdf_accepts_image_data_only_figures(self):
+        doc = DoxDocument(
+            frontmatter=Frontmatter(version="1.0"),
+            elements=[Figure(caption="Embedded", source="", image_data=_tiny_png_b64())],
+        )
+        data = to_pdf_bytes(doc)
+        assert len(data) > 0
+
 
 class TestJSONConverter:
     def test_valid_json(self, doc):
@@ -123,3 +163,10 @@ class TestJSONConverter:
     def test_frontmatter(self, doc):
         d = to_dict(doc)
         assert d["frontmatter"]["source"] == "test.pdf"
+
+
+def _tiny_png_b64() -> str:
+    return (
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADUlEQVR42mNk"
+        "YGBgAAAABQABDQottAAAAABJRU5ErkJggg=="
+    )

@@ -4,6 +4,7 @@ Convert a DoxDocument to standard Markdown (strip .dox extensions).
 
 from __future__ import annotations
 
+from dox.converters._figure_utils import figure_display_src
 from dox.models.document import DoxDocument
 from dox.models.elements import (
     Annotation,
@@ -82,7 +83,7 @@ def to_markdown(doc: DoxDocument) -> str:
             parts.append(f"**{element.key}**: {element.value}")
 
         elif isinstance(element, Figure):
-            parts.append(f"![{element.caption}]({element.source})")
+            parts.append(f"![{element.caption}]({figure_display_src(element)})")
 
         elif isinstance(element, Footnote):
             parts.append(f"[^{element.number}]: {element.text}")

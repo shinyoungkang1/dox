@@ -155,6 +155,25 @@ class TestCodeBlocks:
         assert codes[0].language == "python"
         assert "print" in codes[0].code
 
+    def test_language_hints_with_non_word_characters(self, parser):
+        text = """---dox
+version: "1.0"
+---
+
+```typescript-react
+const x = 1;
+```
+
+```c++
+int main() { return 0; }
+```
+"""
+        doc = parser.parse(text)
+        codes = [e for e in doc.elements if isinstance(e, CodeBlock)]
+        assert len(codes) == 2
+        assert codes[0].language == "typescript-react"
+        assert codes[1].language == "c++"
+
 
 class TestMath:
     def test_math_block(self, parser):

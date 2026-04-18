@@ -27,6 +27,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from dox.converters._figure_utils import figure_binary_source
 from dox.models.document import DoxDocument
 from dox.models.elements import (
     Annotation,
@@ -493,26 +494,22 @@ def _figure_to_flowables(element: Figure, styles: dict) -> list[Any]:
     from reportlab.lib.units import inch
 
     flowables: list[Any] = []
-    source = element.source or ""
-    img_path = Path(source)
-
-    if img_path.exists() and img_path.suffix.lower() in (
-        '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff'
-    ):
+    image_source, label = figure_binary_source(element)
+    if image_source is not None:
         try:
             # NOTE: Image dimensions (5x3 inches) are hardcoded for consistency.
             # To support dynamic sizing, consider adding width/height fields to Figure element.
-            img = Image(str(img_path), width=5 * inch, height=3 * inch)
+            img = Image(image_source, width=5 * inch, height=3 * inch)
             img.hAlign = 'CENTER'
             flowables.append(img)
         except Exception:
             flowables.append(RLParagraph(
-                f"<i>[Image: {_escape_xml(source)}]</i>",
+                f"<i>[Image: {_escape_xml(label)}]</i>",
                 styles["caption"],
             ))
     else:
         flowables.append(RLParagraph(
-            f"<i>[Image: {_escape_xml(source)}]</i>",
+            f"<i>[Image: {_escape_xml(label)}]</i>",
             styles["caption"],
         ))
 

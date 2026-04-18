@@ -7,6 +7,7 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from dox.converters._figure_utils import figure_display_src
 from dox.models.document import DoxDocument
 from dox.models.elements import (
     Annotation,
@@ -101,8 +102,9 @@ def to_html(doc: DoxDocument, standalone: bool = True) -> str:
         elif isinstance(element, Figure):
             cap = f"<figcaption>{_esc(element.caption)}</figcaption>" if element.caption else ""
             fid = f' id="{_esc(element.figure_id)}"' if element.figure_id else ""
+            img_src = figure_display_src(element)
             body_parts.append(
-                f"<figure{fid}><img src=\"{_esc(element.source)}\" "
+                f"<figure{fid}><img src=\"{_esc(img_src)}\" "
                 f'alt="{_esc(element.caption)}" />{cap}</figure>'
             )
 
