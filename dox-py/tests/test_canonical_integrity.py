@@ -15,6 +15,7 @@ from dox.models.elements import (
     KeyValuePair,
     ListBlock,
     ListItem,
+    PageBreak,
     Paragraph,
     Table,
     TableCell,
@@ -379,3 +380,27 @@ def test_ordered_list_nested_children_are_numbered_sequentially():
     text = DoxSerializer().serialize(doc)
     assert "  1. Child A" in text
     assert "  2. Child B" in text
+
+
+def test_pagebreak_json_excludes_generic_element_metadata():
+    doc = DoxDocument(
+        frontmatter=Frontmatter(version="1.0"),
+        elements=[
+            PageBreak(
+                from_page=1,
+                to_page=2,
+                page=99,
+                element_id="pb-1",
+                reading_order=3,
+                lang="en",
+            )
+        ],
+    )
+
+    page_break = to_dict(doc)["elements"][0]
+    assert page_break["from_page"] == 1
+    assert page_break["to_page"] == 2
+    assert "page" not in page_break
+    assert "id" not in page_break
+    assert "reading_order" not in page_break
+    assert "lang" not in page_break

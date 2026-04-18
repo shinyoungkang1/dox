@@ -3,7 +3,7 @@
 import pytest
 from dox.models.document import DoxDocument, Frontmatter
 from dox.models.elements import (
-    BoundingBox, Chart, Heading, Paragraph, Table, TableCell, TableRow,
+    BoundingBox, Chart, Heading, PageBreak, Paragraph, Table, TableCell, TableRow,
 )
 from dox.models.metadata import Confidence, Metadata, Provenance
 from dox.models.spatial import SpatialAnnotation, SpatialBlock
@@ -64,6 +64,18 @@ class TestElementValidation:
         doc.elements = [Chart(data_ref="nonexistent")]
         result = validator.validate(doc)
         assert any("not found" in i.message for i in result.warnings)
+
+    def test_page_break_invalid_range(self, validator):
+        doc = DoxDocument()
+        doc.elements = [PageBreak(from_page=2, to_page=2)]
+        result = validator.validate(doc)
+        assert any("advance forward" in i.message for i in result.errors)
+
+    def test_page_break_with_generic_metadata_warns(self, validator):
+        doc = DoxDocument()
+        doc.elements = [PageBreak(from_page=1, to_page=2, page=1, element_id="pb-1")]
+        result = validator.validate(doc)
+        assert any("structural" in i.message for i in result.warnings)
 
 
 class TestTableValidation:

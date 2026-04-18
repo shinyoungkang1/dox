@@ -222,6 +222,8 @@ dox render report.dox -f pdf              # Styled PDF output
 | **PageBreak** | `---page-break from=1 to=2---` | Page boundaries |
 | **Table (cross-page)** | `continuation_of="t1"` | Tables spanning pages |
 
+`PageBreak` is a structural marker, not a normal content element. It should carry only `from_page` and `to_page`, not generic element metadata.
+
 ---
 
 ## Where `.dox` Fits

@@ -21,6 +21,7 @@ from dox.models.elements import (
     Element,
     FormField,
     Heading,
+    PageBreak,
     Table,
 )
 from dox.models.spatial import SpatialBlock
@@ -183,6 +184,9 @@ class DoxValidator:
                         )
                     )
 
+            elif isinstance(element, PageBreak):
+                self._validate_page_break(element, result)
+
     def _validate_table(self, table: Table, result: ValidationResult) -> None:
         eid = table.table_id or table.element_id
         if not table.rows:
@@ -205,6 +209,44 @@ class DoxValidator:
                         layer=0,
                     )
                 )
+
+    def _validate_page_break(self, page_break: PageBreak, result: ValidationResult) -> None:
+        if page_break.from_page < 1 or page_break.to_page < 1:
+            result.issues.append(
+                ValidationIssue(
+                    Severity.ERROR,
+                    f"PageBreak pages must be >= 1, got from={page_break.from_page}, to={page_break.to_page}",
+                    layer=0,
+                )
+            )
+        elif page_break.to_page <= page_break.from_page:
+            result.issues.append(
+                ValidationIssue(
+                    Severity.ERROR,
+                    f"PageBreak must advance forward, got from={page_break.from_page}, to={page_break.to_page}",
+                    layer=0,
+                )
+            )
+
+        carries_generic_meta = any(
+            [
+                page_break.element_id,
+                page_break.bbox is not None,
+                page_break.confidence is not None,
+                page_break.page is not None,
+                page_break.reading_order is not None,
+                page_break.lang is not None,
+                page_break.is_furniture,
+            ]
+        )
+        if carries_generic_meta:
+            result.issues.append(
+                ValidationIssue(
+                    Severity.WARNING,
+                    "PageBreak is structural and should not carry generic element metadata",
+                    layer=0,
+                )
+            )
 
     # ------------------------------------------------------------------
     # Spatial (Layer 1)

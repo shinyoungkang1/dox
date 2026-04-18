@@ -102,6 +102,13 @@ def _element_to_dict(element: Element) -> dict[str, Any]:
         pass
 
     elif isinstance(element, PageBreak):
+        base.pop("id", None)
+        base.pop("bbox", None)
+        base.pop("confidence", None)
+        base.pop("page", None)
+        base.pop("reading_order", None)
+        base.pop("lang", None)
+        base.pop("is_furniture", None)
         base["from_page"] = element.from_page
         base["to_page"] = element.to_page
 
